@@ -15,7 +15,8 @@ logger = logging.getLogger(__name__)
 
 def get_faq_response(db: Session, question: str):
     faq = db.query(models.FAQ).filter(
-        models.FAQ.question.ilike(f"%{question}%")).first()
+        # models.FAQ.question.ilike(f"%{question}%")).first()
+        models.FAQ.question == question.strip()).first()
     if faq:
         logger.info(f"FAQ match found for question: {question}")
         return faq.answer
@@ -43,7 +44,7 @@ def get_ai_response(question: str):
         return "API authentication failed. Please check the server logs."
     except openai.error.RateLimitError:
         logger.error("OpenAI API rate limit exceeded.")
-        return "Rate limit exceeded. Please wait and try again later."
+        return "Please ask predefined FAQs as the rate limit is exceeded."
     except openai.error.OpenAIError as e:
         logger.error(f"OpenAI API error: {str(e)}")
         return f"OpenAI error: {str(e)}"
